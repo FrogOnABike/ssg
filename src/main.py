@@ -1,6 +1,7 @@
 from textnode import TextNode,TextType
 from htmlnode import HTMLNode,LeafNode,ParentNode
-from convertors import text_node_to_html_node,split_nodes_delimiter
+from convertors import *
+import mistune
 
 def main():
     # test_textnode = TextNode("This is some test text",TextType.ANCHOR,"https://www.boot.dev")
@@ -113,12 +114,22 @@ def main():
     # print(text_node_to_html_node(node))
     
     # nodes = [TextNode("This is text with a `code block` word", TextType.TEXT),TextNode("This is another text with a `code block` and another `code block secion!`", TextType.TEXT),TextNode("This is just a text node", TextType.TEXT)]
-    node = TextNode("**already bold**", TextType.BOLD)
-    new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
-    print(new_nodes)
+    # node = TextNode("**already bold**", TextType.BOLD)
+    # new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
+    # print(new_nodes)
     
-    for node in new_nodes:
-        print(text_node_to_html_node(node))
+    # for node in new_nodes:
+    #     print(text_node_to_html_node(node))
+    
+    markdown = mistune.create_markdown(renderer='ast')
+    text = "[a [nested] alt](https://example.com/image.png)"
+    print(f"Image extractor: {extract_markdown_images(text)}")
+    
+    # text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+    print(f"Link extractor: {extract_markdown_links(text)}")
+    print(f"Output from mistune: {markdown(text)}")
+    
+
 
 if __name__ == "__main__":
     main()
