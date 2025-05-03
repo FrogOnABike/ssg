@@ -173,3 +173,4 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 src/#test_htmlnode_from_gemini.py
+src/test_TEMPLATE.py
