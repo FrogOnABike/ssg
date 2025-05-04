@@ -81,4 +81,14 @@ def split_nodes_image(old_nodes):
     # print(re.search(r"(\[.*?\))",old_nodes.text))
     # node_split = re.split(r"(\[.*?\))",old_nodes.text)
     
+def text_to_textnodes(text):
+    master_nodes = [TextNode(text,TextType.TEXT)]
     
+    master_nodes = split_nodes_delimiter(master_nodes,"**",TextType.BOLD)
+    master_nodes = split_nodes_delimiter(master_nodes,"_",TextType.ITALIC)
+    master_nodes = split_nodes_delimiter(master_nodes,"`",TextType.CODE)
+    master_nodes = split_nodes_link(master_nodes)
+    master_nodes = split_nodes_image(master_nodes)
+    
+    return master_nodes
+

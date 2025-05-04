@@ -136,10 +136,8 @@ def main():
 
 
     # ****Text string****
-    text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
-    
-    
-    
+    text = "This is **bold text** with an _italic word_ and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+
     markdown = mistune.create_markdown(renderer='ast')
     
     # print(f"Image extractor: {extract_markdown_images(text)}")
@@ -147,11 +145,11 @@ def main():
     # print(f"Link extractor: {extract_markdown_links(text)}")
     # print(f"Output from mistune: {markdown(text)}")
     
-    print(f"split_nodes_link: {split_nodes_link([node])}")
+    # print(f"split_nodes_link: {split_nodes_link([node])}")
     
-    print(f"split_nodes_image: {split_nodes_image([node])}")
+    # print(f"split_nodes_image: {split_nodes_image([node])}")
     
-
+    print(f"Text to TextNode output: {text_to_textnodes(text)}")
 
 
 

@@ -77,14 +77,17 @@ class TestTextNode(unittest.TestCase):
     
     def test_split_images_multiple_input_pair_nodes(self):
         """Test extraction for 2 image TextNodes with multiple images"""
-        # node = TextNode("This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and a [link to boot.dev](https://boot.dev)",TextType.TEXT)
         new_nodes = split_nodes_image([multi_image_node,multi_image_node2])
         self.assertListEqual(
             [
                 TextNode("This is text with an ", TextType.TEXT),
                 TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode("second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"),
                 TextNode("This is text with an ", TextType.TEXT),
                 TextNode("image", TextType.IMAGE, "https://i.imgur.com/zoo.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode("second image", TextType.IMAGE, "https://i.imgur.com/cat.png"),
             ],
             new_nodes,
         )
