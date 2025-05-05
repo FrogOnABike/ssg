@@ -92,3 +92,21 @@ def text_to_textnodes(text):
     
     return master_nodes
 
+def markdown_to_blocks(markdown):
+    return_blocks = []
+    split_blocks = markdown.split("\n\n")
+    cleaned_blocks = [remove_newline_whitespace(block).strip() for block in split_blocks]
+    return cleaned_blocks
+
+def remove_newline_whitespace(text):
+    """
+    Removes whitespace between a newline character and the following character.
+
+    Args:
+        text: The input string.
+
+    Returns:
+        The modified string with the whitespace removed.
+    """
+    pattern = r"\n\s*([^\s])"
+    return re.sub(pattern, r"\n\1", text)
