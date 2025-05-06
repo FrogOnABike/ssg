@@ -136,7 +136,8 @@ def main():
 
 
     # ****Text string****
-    text = "This is **bold text** with an _italic word_ and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+    text = """"
+    >To be or not to be innit mate?"""
 
     markdown = mistune.create_markdown(renderer='ast')
     
@@ -149,7 +150,9 @@ def main():
     
     # print(f"split_nodes_image: {split_nodes_image([node])}")
     
-    print(f"Text to TextNode output: {text_to_textnodes(text)}")
+    # print(f"Text to TextNode output: {text_to_textnodes(text)}")
+    
+    block_to_block_type(text)
 
 
 

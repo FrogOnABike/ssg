@@ -1,5 +1,6 @@
 from htmlnode import LeafNode,ParentNode,HTMLNode
 from textnode import TextNode,TextType
+from block import Block,BlockType
 import enum
 import re
 
@@ -110,3 +111,42 @@ def remove_newline_whitespace(text):
     """
     pattern = r"\n\s*([^\s])"
     return re.sub(pattern, r"\n\1", text)
+
+def block_to_block_type(text):
+    
+    # print(f"Input text: {text}")
+    
+    if re.search("^(- )",text) is not None:
+        # print(f"Found text(regex): {text}")
+        # print(f"This is a {BlockType.UNORDERED_LIST.value} block")
+        return BlockType.UNORDERED_LIST
+    
+    if re.search("^(\n|\t|\r)?\d+\. ",text,re.MULTILINE) is not None:
+        # print(f"Found text(regex): {text}")
+        # print(f"This is a {BlockType.ORDERED_LIST.value} block")
+        return BlockType.ORDERED_LIST
+    
+    if re.search("^>( )?",text,re.MULTILINE) is not None:
+        print(f"Found text(regex): {text}")
+        print(f"This is a {BlockType.QUOTE.value} block")
+        return BlockType.QUOTE
+    
+    if re.search("^`{3}",text,re.MULTILINE) is not None:
+        # print(f"Found text(regex): {text}")
+        # print(f"This is a {BlockType.CODE.value} block")
+        return BlockType.CODE
+
+    if re.search("^\#{1,6}\s*([^\#]*)\s*(\#{1,6})?$",text,re.MULTILINE) is not None:
+        # print(f"Found text(regex): {text}")
+        # print(f"This is a {BlockType.HEADING.value} block")
+        return BlockType.HEADING
+    
+    else:
+        print(f"This is a {BlockType.PARAGRAPH.value} block")
+        return BlockType.PARAGRAPH
+    
+    # if text.startswith(">"):
+    #     print(f"This is a {BlockType.QUOTE.value} block")
+    #     return BlockType.QUOTE
+
+
