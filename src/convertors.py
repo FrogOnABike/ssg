@@ -5,6 +5,7 @@ import enum
 import re
 
 def text_node_to_html_node(text_node):
+    # Create a LeafNode from a TextNode based on TextType
     match text_node.text_type:
         case TextType.TEXT:
             return LeafNode(None,text_node.text)
@@ -23,6 +24,7 @@ def text_node_to_html_node(text_node):
             
             
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
+    # Takes a list of TEXT TextNodes and returns an updates list of TextNodes with correct TextType
     return_nodes = []
     for node in old_nodes:
         match node.text_type:
@@ -40,12 +42,15 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
     return return_nodes
 
 def extract_markdown_images(text):
+    # Extract image text and URL
     return re.findall(r"!\[([^\[\]]*)\]\(([^\(\)]*)\)",text)
 
 def extract_markdown_links(text):
+    # Extract link text and URL
     return re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)",text)
 
 def split_nodes_link(old_nodes):
+    # Takes a list of TEXT TextNodes and returns an updates list of TextNodes with correct TextType, Value and URL for links
     return_nodes = []
     for node in old_nodes:
         if re.search(r"(?<!!)(\[.*?\))",node.text) is None:
@@ -63,6 +68,7 @@ def split_nodes_link(old_nodes):
     return return_nodes
 
 def split_nodes_image(old_nodes):
+    # Takes a list of TEXT TextNodes and returns an updates list of TextNodes with correct TextType, Value and URL for images
     return_nodes = []
     for node in old_nodes:
         if re.search(r"!(\[.*?\))",node.text) is None:
@@ -83,6 +89,7 @@ def split_nodes_image(old_nodes):
     # node_split = re.split(r"(\[.*?\))",old_nodes.text)
     
 def text_to_textnodes(text):
+    # Converts raw Markdown and retruns a list of TextNodes for inline items (Bold, Italic, Code, Links and Images)
     master_nodes = [TextNode(text,TextType.TEXT)]
     
     master_nodes = split_nodes_delimiter(master_nodes,"**",TextType.BOLD)
@@ -94,8 +101,14 @@ def text_to_textnodes(text):
     return master_nodes
 
 def markdown_to_blocks(markdown):
+    # Splits Markdown into blocks, which can then be checked via block_to_block_type - Returns a list of strings, so need to iterate over that
     return_blocks = []
     split_blocks = markdown.split("\n\n")
+    print(f"Split blocks before removing blanks: {split_blocks}")
+    for i,txt in enumerate(split_blocks):
+        if txt == "":
+            del split_blocks[i]
+    print(f"Split blocks after blanks: {split_blocks}")
     cleaned_blocks = [remove_newline_whitespace(block).strip() for block in split_blocks]
     return cleaned_blocks
 
@@ -110,39 +123,28 @@ def remove_newline_whitespace(text):
         The modified string with the whitespace removed.
     """
     pattern = r"\n\s*([^\s])"
+    if re.sub(pattern, r"\n\1", text) is None:
+        return
     return re.sub(pattern, r"\n\1", text)
 
 def block_to_block_type(text):
-    
-    # print(f"Input text: {text}")
-    
+    # Returns a BlockType for Markdown text
     if re.search("^(- )",text) is not None:
-        # print(f"Found text(regex): {text}")
-        # print(f"This is a {BlockType.UNORDERED_LIST.value} block")
         return BlockType.UNORDERED_LIST
     
     if re.search("^(\n|\t|\r)?\d+\. ",text,re.MULTILINE) is not None:
-        # print(f"Found text(regex): {text}")
-        # print(f"This is a {BlockType.ORDERED_LIST.value} block")
         return BlockType.ORDERED_LIST
     
     if re.search("^>( )?",text,re.MULTILINE) is not None:
-        print(f"Found text(regex): {text}")
-        print(f"This is a {BlockType.QUOTE.value} block")
         return BlockType.QUOTE
     
     if re.search("^`{3}",text,re.MULTILINE) is not None:
-        # print(f"Found text(regex): {text}")
-        # print(f"This is a {BlockType.CODE.value} block")
         return BlockType.CODE
 
     if re.search("^\#{1,6}\s*([^\#]*)\s*(\#{1,6})?$",text,re.MULTILINE) is not None:
-        # print(f"Found text(regex): {text}")
-        # print(f"This is a {BlockType.HEADING.value} block")
         return BlockType.HEADING
     
     else:
-        print(f"This is a {BlockType.PARAGRAPH.value} block")
         return BlockType.PARAGRAPH
     
     # if text.startswith(">"):
@@ -150,3 +152,31 @@ def block_to_block_type(text):
     #     return BlockType.QUOTE
 
 
+def markdown_to_html_node(markdown):
+    master_nodes=[]
+    blocks = markdown_to_blocks(markdown)
+    # print(f"Converted blocks: {blocks}")
+    for block in blocks:
+        match block_to_block_type(block):
+            case BlockType.PARAGRAPH:
+                block_tn = []
+                child_nodes = []
+                block_tn = text_to_textnodes(block.replace("\n"," "))
+                # print(f"Block TNs: {block_tn}")
+                for kid in block_tn:
+                    child_nodes.append(text_node_to_html_node(kid))
+                # print(f"Child HTML Nodes: {child_nodes}")
+                master_nodes.append(ParentNode("p",child_nodes))
+            case BlockType.CODE:
+                text = block.replace("```","").replace("\n","")
+                code_tn = TextNode(text,TextType.CODE)
+                print(f"Code TN: {code_tn}")
+                # text = re.sub(r"^`{3}","<code>",block)
+                # text = re.sub(r"`{3}$","</code>",text)
+                # print(f"Code Block: {block}")
+                # print(f"Hopefully fixed text!:{text}")
+                # code_node = LeafNode(None,text)
+                master_nodes.append(ParentNode("pre",[text_node_to_html_node(code_tn)]))
+       
+    return ParentNode("div",master_nodes)
+                                                
