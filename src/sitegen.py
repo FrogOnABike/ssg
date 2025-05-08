@@ -15,10 +15,10 @@ def copy_content(src_dir,dest_dir):
         if path.isfile(path.join(src_dir,obj)):
             copy(path.join(src_dir,obj),path.join(dest_dir,obj))
         if path.isdir(path.join(src_dir,obj)):
-            mkdir(path.join(dest_dir,obj))
+            # mkdir(path.join(dest_dir,obj))
             current_src_dir = path.join(src_dir,obj)
             current_dest_dir = path.join(dest_dir,obj)
-    copy_content(current_src_dir,current_dest_dir)
             
-            
-    
+    if listdir(src_dir) != listdir(dest_dir):
+        copy_content(current_src_dir,current_dest_dir)
+        
