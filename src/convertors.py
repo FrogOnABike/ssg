@@ -162,21 +162,45 @@ def markdown_to_html_node(markdown):
                 block_tn = []
                 child_nodes = []
                 block_tn = text_to_textnodes(block.replace("\n"," "))
-                # print(f"Block TNs: {block_tn}")
                 for kid in block_tn:
                     child_nodes.append(text_node_to_html_node(kid))
-                # print(f"Child HTML Nodes: {child_nodes}")
                 master_nodes.append(ParentNode("p",child_nodes))
             case BlockType.CODE:
-                text = block.replace("```","").replace("\n","")
+                # print(f"Block: {block}")
+                text = block.strip("```").lstrip()
+                # print(f"Text after removing ```:{text}")
                 code_tn = TextNode(text,TextType.CODE)
-                print(f"Code TN: {code_tn}")
-                # text = re.sub(r"^`{3}","<code>",block)
-                # text = re.sub(r"`{3}$","</code>",text)
-                # print(f"Code Block: {block}")
-                # print(f"Hopefully fixed text!:{text}")
-                # code_node = LeafNode(None,text)
-                master_nodes.append(ParentNode("pre",[text_node_to_html_node(code_tn)]))
-       
+                # print(f"Code TN: {code_tn}")
+                child_node = text_node_to_html_node(code_tn)
+                # print(f"Child Node:{child_node}")
+                master_nodes.append(ParentNode("pre",[child_node]))
+            case BlockType.QUOTE:
+                text = block.replace(">","")
+                # text = re.sub("^> ?","")
+                quote_ln = LeafNode("p",text)
+                master_nodes.append(ParentNode("blockquote",[quote_ln]))
+            case BlockType.HEADING:
+                i = block.count("#",0,6)
+                print(f"Heading level:{i}")
+                text = block.lstrip("#").strip()
+                print(f"Header text:{text}")
+                master_nodes.append(LeafNode(f"h{i}",text))
+            case BlockType.UNORDERED_LIST:
+                child_nodes = []
+                items = block.splitlines()
+                print(f"Split lines:{items}")
+                for i in items:
+                    text = i.lstrip("- ")
+                    child_nodes.append(LeafNode("li",text))
+                master_nodes.append(ParentNode("ul",child_nodes))
+            case BlockType.ORDERED_LIST:
+                child_nodes = []
+                items = block.splitlines()
+                print(f"Split lines:{items}")
+                for i in items:
+                    text = re.sub("(\d*\. )","",i)
+                    child_nodes.append(LeafNode("li",text))
+                master_nodes.append(ParentNode("ol",child_nodes))
+                       
     return ParentNode("div",master_nodes)
                                                 
