@@ -28,7 +28,7 @@ def extract_title(markdown):
         raise Exception("No valid header found")
     return re.search("(?:^# )(.*)",markdown).group(1)
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path,basepath):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
     with open(from_path, 'r') as f:
         src_md = f.read()
@@ -44,12 +44,12 @@ def generate_page(from_path, template_path, dest_path):
     
     md_title = extract_title(src_md)
     
-    final_html = html_template.replace("{{ Title }}",md_title).replace("{{ Content }}",html)
+    final_html = html_template.replace("{{ Title }}",md_title).replace("{{ Content }}",html).replace("href=\"/",f"href=\"{basepath}").replace("src=\"/",f"src=\"{basepath}")
     
     with open(dest_path, 'w') as f:
         f.write(final_html)
         
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path,basepath):
     dir_content = []
     dir_content = listdir(dir_path_content)
     
@@ -59,9 +59,9 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
     for obj in dir_content:
         if path.isfile(path.join(dir_path_content,obj)):
             print(f"Split Ext:{splitext(obj)[0]}.html")
-            generate_page(path.join(dir_path_content,obj),template_path,path.join(dest_dir_path,f"{splitext(obj)[0]}.html"))                
+            generate_page(path.join(dir_path_content,obj),template_path,path.join(dest_dir_path,f"{splitext(obj)[0]}.html"),basepath)                
         if path.isdir(path.join(dir_path_content,obj)):
             # mkdir(path.join(dest_dir,obj))
             current_src_dir = path.join(dir_path_content,obj)
             current_dest_dir = path.join(dest_dir_path,obj)
-            generate_pages_recursive(current_src_dir,template_path,current_dest_dir)
+            generate_pages_recursive(current_src_dir,template_path,current_dest_dir,basepath)
