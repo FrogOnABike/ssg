@@ -1,4 +1,5 @@
 from os import path,listdir,mkdir
+from os.path import splitext
 from shutil import copy,rmtree
 from convertors import markdown_to_html_node
 import re
@@ -48,3 +49,19 @@ def generate_page(from_path, template_path, dest_path):
     with open(dest_path, 'w') as f:
         f.write(final_html)
         
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    dir_content = []
+    dir_content = listdir(dir_path_content)
+    
+    if not path.isdir(dest_dir_path):
+        mkdir(dest_dir_path)
+    
+    for obj in dir_content:
+        if path.isfile(path.join(dir_path_content,obj)):
+            print(f"Split Ext:{splitext(obj)[0]}.html")
+            generate_page(path.join(dir_path_content,obj),template_path,path.join(dest_dir_path,f"{splitext(obj)[0]}.html"))                
+        if path.isdir(path.join(dir_path_content,obj)):
+            # mkdir(path.join(dest_dir,obj))
+            current_src_dir = path.join(dir_path_content,obj)
+            current_dest_dir = path.join(dest_dir_path,obj)
+            generate_pages_recursive(current_src_dir,template_path,current_dest_dir)

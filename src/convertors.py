@@ -181,11 +181,16 @@ def markdown_to_html_node(markdown):
                 quote_ln = LeafNode(None,text)
                 master_nodes.append(ParentNode("blockquote",[quote_ln]))
             case BlockType.HEADING:
+                child_nodes =[]
                 i = block.count("#",0,6)
                 # print(f"Heading level:{i}")
                 text = block.lstrip("#").strip()
+                header_tn = text_to_textnodes(text)
+                for h in header_tn:
+                    child_node = text_node_to_html_node(h)
+                    child_nodes.append(child_node)
                 # print(f"Header text:{text}")
-                master_nodes.append(LeafNode(f"h{i}",text))
+                master_nodes.append(ParentNode(f"h{i}",child_nodes))
             case BlockType.UNORDERED_LIST:
                 child_nodes = []  
                 items = block.splitlines()
@@ -194,12 +199,12 @@ def markdown_to_html_node(markdown):
                     item_nodes = []
                     text = i.lstrip("- ")
                     li_tn = text_to_textnodes(text)
-                    print(f"List TN: {li_tn}")
+                    # print(f"List TN: {li_tn}")
                     for n in li_tn:
                         temp_html_node = text_node_to_html_node(n)
-                        print(f"Temp HTML Node(s): {temp_html_node}")
+                        # print(f"Temp HTML Node(s): {temp_html_node}")
                         item_nodes.append(temp_html_node)
-                        print(f"List HTML Nodes:{item_nodes}")
+                        # print(f"List HTML Nodes:{item_nodes}")
                     child_nodes.append(ParentNode("li",item_nodes))
                 master_nodes.append(ParentNode("ul",child_nodes))
             case BlockType.ORDERED_LIST:
@@ -210,12 +215,12 @@ def markdown_to_html_node(markdown):
                     item_nodes = []
                     text = re.sub("(\d*\. )","",i)
                     li_tn = text_to_textnodes(text)
-                    print(f"List TN: {li_tn}")
+                    # print(f"List TN: {li_tn}")
                     for n in li_tn:
                         temp_html_node = text_node_to_html_node(n)
-                        print(f"Temp HTML Node(s): {temp_html_node}")
+                        # print(f"Temp HTML Node(s): {temp_html_node}")
                         item_nodes.append(temp_html_node)
-                        print(f"List HTML Nodes:{item_nodes}")
+                        # print(f"List HTML Nodes:{item_nodes}")
                     child_nodes.append(ParentNode("li",item_nodes))
                 master_nodes.append(ParentNode("ol",child_nodes))
                        
