@@ -53,7 +53,7 @@ the **same** even with inline stuff
         html = node.to_html()
         self.assertEqual(
             html,
-            "<div><blockquote><p> To be or not to be?\n That is a great question!\n Now can I just keep typing?\n How does this paste out????</p></blockquote></div>",
+            "<div><blockquote>To be or not to be?\n That is a great question!\n Now can I just keep typing?\n How does this paste out????</blockquote></div>",
         )
 
     def test_headerblock(self):

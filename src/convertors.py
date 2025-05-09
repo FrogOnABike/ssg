@@ -104,11 +104,11 @@ def markdown_to_blocks(markdown):
     # Splits Markdown into blocks, which can then be checked via block_to_block_type - Returns a list of strings, so need to iterate over that
     return_blocks = []
     split_blocks = markdown.split("\n\n")
-    print(f"Split blocks before removing blanks: {split_blocks}")
+    # print(f"Split blocks before removing blanks: {split_blocks}")
     for i,txt in enumerate(split_blocks):
         if txt == "":
             del split_blocks[i]
-    print(f"Split blocks after blanks: {split_blocks}")
+    # print(f"Split blocks after blanks: {split_blocks}")
     cleaned_blocks = [remove_newline_whitespace(block).strip() for block in split_blocks]
     return cleaned_blocks
 
@@ -176,30 +176,47 @@ def markdown_to_html_node(markdown):
                 master_nodes.append(ParentNode("pre",[child_node]))
             case BlockType.QUOTE:
                 text = block.replace(">","")
+                text = text.strip()
                 # text = re.sub("^> ?","")
-                quote_ln = LeafNode("p",text)
+                quote_ln = LeafNode(None,text)
                 master_nodes.append(ParentNode("blockquote",[quote_ln]))
             case BlockType.HEADING:
                 i = block.count("#",0,6)
-                print(f"Heading level:{i}")
+                # print(f"Heading level:{i}")
                 text = block.lstrip("#").strip()
-                print(f"Header text:{text}")
+                # print(f"Header text:{text}")
                 master_nodes.append(LeafNode(f"h{i}",text))
             case BlockType.UNORDERED_LIST:
-                child_nodes = []
+                child_nodes = []  
                 items = block.splitlines()
-                print(f"Split lines:{items}")
+                # print(f"Split lines:{items}")
                 for i in items:
+                    item_nodes = []
                     text = i.lstrip("- ")
-                    child_nodes.append(LeafNode("li",text))
+                    li_tn = text_to_textnodes(text)
+                    print(f"List TN: {li_tn}")
+                    for n in li_tn:
+                        temp_html_node = text_node_to_html_node(n)
+                        print(f"Temp HTML Node(s): {temp_html_node}")
+                        item_nodes.append(temp_html_node)
+                        print(f"List HTML Nodes:{item_nodes}")
+                    child_nodes.append(ParentNode("li",item_nodes))
                 master_nodes.append(ParentNode("ul",child_nodes))
             case BlockType.ORDERED_LIST:
                 child_nodes = []
                 items = block.splitlines()
-                print(f"Split lines:{items}")
+                # print(f"Split lines:{items}")
                 for i in items:
+                    item_nodes = []
                     text = re.sub("(\d*\. )","",i)
-                    child_nodes.append(LeafNode("li",text))
+                    li_tn = text_to_textnodes(text)
+                    print(f"List TN: {li_tn}")
+                    for n in li_tn:
+                        temp_html_node = text_node_to_html_node(n)
+                        print(f"Temp HTML Node(s): {temp_html_node}")
+                        item_nodes.append(temp_html_node)
+                        print(f"List HTML Nodes:{item_nodes}")
+                    child_nodes.append(ParentNode("li",item_nodes))
                 master_nodes.append(ParentNode("ol",child_nodes))
                        
     return ParentNode("div",master_nodes)

@@ -1,12 +1,14 @@
 from os import path,listdir,mkdir
 from shutil import copy,rmtree
+from convertors import markdown_to_html_node
+import re
 
 def copy_content(src_dir,dest_dir):
     if path.isdir(dest_dir):
-        print(f"Dest contents: {listdir(dest_dir)}")
+        # print(f"Dest contents: {listdir(dest_dir)}")
         rmtree(dest_dir)
     mkdir(dest_dir)
-    print(f"Src contents: {listdir(src_dir)}")
+    # print(f"Src contents: {listdir(src_dir)}")
     # current_src_dir = src_dir
     # current_dest_dir = dest_dir
     dir_content = []
@@ -18,7 +20,31 @@ def copy_content(src_dir,dest_dir):
             # mkdir(path.join(dest_dir,obj))
             current_src_dir = path.join(src_dir,obj)
             current_dest_dir = path.join(dest_dir,obj)
-            
-    if listdir(src_dir) != listdir(dest_dir):
-        copy_content(current_src_dir,current_dest_dir)
+            copy_content(current_src_dir,current_dest_dir)
+                   
+def extract_title(markdown):
+    if re.search("(?:^# )(.*)",markdown) is None:
+        raise Exception("No valid header found")
+    return re.search("(?:^# )(.*)",markdown).group(1)
+
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    with open(from_path, 'r') as f:
+        src_md = f.read()
+    
+    with open(template_path, 'r') as f:
+        html_template = f.read()
+    
+    # print(f"Src MD: {src_md}")
+    # print(f"HTML Template: {html_template}")
+    
+    html_nodes = markdown_to_html_node(src_md)
+    html = html_nodes.to_html()
+    
+    md_title = extract_title(src_md)
+    
+    final_html = html_template.replace("{{ Title }}",md_title).replace("{{ Content }}",html)
+    
+    with open(dest_path, 'w') as f:
+        f.write(final_html)
         
