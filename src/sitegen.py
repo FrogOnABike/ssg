@@ -58,7 +58,7 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path,base
     
     for obj in dir_content:
         if path.isfile(path.join(dir_path_content,obj)):
-            print(f"Split Ext:{splitext(obj)[0]}.html")
+            # print(f"Split Ext:{splitext(obj)[0]}.html")
             generate_page(path.join(dir_path_content,obj),template_path,path.join(dest_dir_path,f"{splitext(obj)[0]}.html"),basepath)                
         if path.isdir(path.join(dir_path_content,obj)):
             # mkdir(path.join(dest_dir,obj))
